@@ -6,15 +6,21 @@ import BootState from './states/Boot'
 import SplashState from './states/Splash'
 import GameState from './states/Game'
 
-import config from './config'
-
 class Game extends Phaser.Game {
-  constructor () {
-    const docElement = document.documentElement
-    const width = docElement.clientWidth > config.gameWidth ? config.gameWidth : docElement.clientWidth
-    const height = docElement.clientHeight > config.gameHeight ? config.gameHeight : docElement.clientHeight
+  constructor() {
+    let gameHeight = window.innerHeight * window.devicePixelRatio;
+    let gameWidth = window.innerWidth * window.devicePixelRatio;
+    let ratio = gameHeight / gameWidth;
 
-    super(width, height, Phaser.CANVAS, 'content', null)
+    console.info("game ratio before: " + gameHeight / gameWidth);
+    if (ratio > 0.75) {
+      gameHeight = gameWidth * 0.75;
+    } else if (ratio < 0.55) {
+      gameWidth = gameHeight / 0.55;
+    }
+    console.info("game ratio before: " + gameHeight / gameWidth);
+
+    super(gameWidth, gameHeight, Phaser.CANVAS, 'content', null)
 
     this.state.add('Boot', BootState, false)
     this.state.add('Splash', SplashState, false)
