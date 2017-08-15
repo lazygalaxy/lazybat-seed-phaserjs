@@ -14,8 +14,8 @@ var mapRows;
 const sceneCols = 9;
 const sceneRows = 5;
 
-const playerRow = 8;
-const playerCol = 7;
+const playerCol = 2;
+const playerRow = 2;
 
 function readTextFile(game, file) {
   var rawFile = new XMLHttpRequest();
@@ -47,16 +47,21 @@ function setScale(sprite, size) {
 }
 
 function addSprite(game, key, xPosi, yPosi) {
-  //TODO: only add and return sprites that are visible to the user
-  const xPerc = xPosi / (sceneCols - 1);
-  const yPerc = Math.tanh((yPosi / (sceneRows - 1)) * (Math.PI / 3.0));
-  const sprite = game.add.sprite(game.width * xPerc, ((game.height - skyHeight) * (1.0 - yPerc)) + skyHeight, key);
-  sprite.anchor.setTo(0.5, 1.0);
-  return sprite;
+  const activeSceneHorizontal = Math.floor((mapRows - playerRow) / sceneRows) * sceneRows;
+  if (yPosi >= activeSceneHorizontal) {
+    //TODO: only add and return sprites that are visible to the user
+    const xPerc = (xPosi / (mapCols - 1)) * (mapCols / sceneCols);
+    const yPerc = Math.tanh(((yPosi - activeSceneHorizontal) / (sceneRows - 1)) * (Math.PI / 3.0));
+    const sprite = game.add.sprite(game.width * xPerc, ((game.height - skyHeight) * (1.0 - yPerc)) + skyHeight, key);
+    sprite.anchor.setTo(0.5, 1.0);
+    return sprite;
+  }
+  return null;
 }
 
 function hitWorldBounds(sprite) {
   console.info(sprite.x + " " + sprite.y);
+  this.state.start('Boot')
 }
 
 export default class extends Phaser.State {
@@ -135,7 +140,7 @@ export default class extends Phaser.State {
             }
             break;
           case 'B':
-            ball = addSprite(game, 'ball', x, mapRows - y - 1);
+            //ball = addSprite(game, 'ball', x, mapRows - y - 1);
             if (ball) {
               game.physics.enable(ball, Phaser.Physics.ARCADE);
               sprites.push(ball);
@@ -157,14 +162,14 @@ export default class extends Phaser.State {
     //player.body.onCollide.add(hitWorldBounds, this);
 
     //game.world.wrap(player, 0, true);
-    game.camera.follow(player);
+    game.camera.follow(player, Phaser.Camera.FOLLOW_LOCKON, 0.1, 0.1);
     cursors = game.input.keyboard.createCursorKeys();
   }
 
   //TODO update is executed continuously, maybe an optimization here?
   update() {
     setScale(player, 1.7);
-    setScale(ball, 1.0);
+    //setScale(ball, 1.0);
     game.world.bringToTop(player);
 
     for (var i = 0; i < sprites.length; i++) {
@@ -174,20 +179,22 @@ export default class extends Phaser.State {
       }
     }
 
+    //ball.body.velocity.x = 0;
+    //ball.body.velocity.y = 0;
+
     player.body.velocity.x = 0;
     player.body.velocity.y = 0;
 
-    ball.body.velocity.x = 0;
-    ball.body.velocity.y = 0;
+    if (cursors.up.isDown) {
+      player.body.velocity.y = -250;
+    } else if (cursors.down.isDown) {
+      player.body.velocity.y = 250;
+    }
 
     if (cursors.left.isDown) {
       player.body.velocity.x = -250;
     } else if (cursors.right.isDown) {
       player.body.velocity.x = 250;
-    } else if (cursors.up.isDown) {
-      player.body.velocity.y = -250;
-    } else if (cursors.down.isDown) {
-      player.body.velocity.y = 250;
     }
 
     //console.info('player position: ' + player.body.x + ' ' + player.body.y);
