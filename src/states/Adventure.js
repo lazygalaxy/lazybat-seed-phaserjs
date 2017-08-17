@@ -5,6 +5,8 @@ var ball;
 let sprites = [];
 var cursors;
 
+var facing = 'right';
+
 var gameScaleRatio;
 var skyHeight;
 
@@ -70,7 +72,7 @@ export default class extends Phaser.State {
   preload() {
     this.stage.backgroundColor = '#54fc54';
 
-    this.load.image('player', './assets/sprites/phaser-dude.png');
+    game.load.spritesheet('player', 'assets/sprites/dude2.png', 32, 48);
     this.load.image('tree', './assets/sprites/tree.png');
     this.load.image('rock', './assets/sprites/rock.png');
     this.load.image('castle', './assets/sprites/castle2.png');
@@ -152,12 +154,26 @@ export default class extends Phaser.State {
 
     player = addSprite(game, 'player', playerCol, mapRows - playerRow - 1);
     game.physics.enable(player, Phaser.Physics.ARCADE);
-    player.body.setSize(27, 5, 0, 35);
+    player.body.bounce.y = 0.2;
+    player.body.setSize(32, 8, 0, 40);
     player.events.onInputDown.add(listener, this);
 
     player.body.collideWorldBounds = true;
     player.body.onWorldBounds = new Phaser.Signal();
     player.body.onWorldBounds.add(hitWorldBounds, this);
+
+    player.animations.add('left', [
+      0, 1, 2, 3
+    ], 10, true);
+    player.animations.add('down', [
+      4, 5, 6, 7
+    ], 20, true);
+    player.animations.add('right', [
+      8, 9, 10, 11
+    ], 10, true);
+    player.animations.add('up', [
+      12, 13, 14, 15
+    ], 10, true);
     //player.body.onCollide = new Phaser.Signal();
     //player.body.onCollide.add(hitWorldBounds, this);
 
@@ -185,25 +201,54 @@ export default class extends Phaser.State {
     player.body.velocity.x = 0;
     player.body.velocity.y = 0;
 
+    const speed = 200 * (player.body.position.y / game.height);
+
     if (cursors.up.isDown) {
-      player.body.velocity.y = -250;
+      player.body.velocity.y = -speed;
+      if (facing != 'up') {
+        player.animations.play('up');
+        facing = 'up';
+      }
     } else if (cursors.down.isDown) {
-      player.body.velocity.y = 250;
-    }
-
-    if (cursors.left.isDown) {
-      player.body.velocity.x = -250;
+      player.body.velocity.y = speed;
+      if (facing != 'down') {
+        player.animations.play('down');
+        facing = 'down';
+      }
+    } else if (cursors.left.isDown) {
+      player.body.velocity.x = -speed;
+      if (facing != 'left') {
+        player.animations.play('left');
+        facing = 'left';
+      }
     } else if (cursors.right.isDown) {
-      player.body.velocity.x = 250;
+      player.body.velocity.x = speed;
+      if (facing != 'right') {
+        player.animations.play('right');
+        facing = 'right';
+      }
+    } else {
+      if (facing != 'idle') {
+        player.animations.stop();
+        if (facing == 'left') {
+          player.frame = 0;
+        } else if (facing == 'down') {
+          player.frame = 4;
+        } else if (facing == 'right') {
+          player.frame = 8;
+        } else if (facing == 'up') {
+          player.frame = 12;
+        }
+        facing = 'idle';
+      }
     }
-
     //console.info('player position: ' + player.body.x + ' ' + player.body.y);
   }
 
   render() {
-    //game.debug.body(player);
+    game.debug.body(player);
     for (var i = 0; i < sprites.length; i++) {
-      //game.debug.body(sprites[i]);
+      game.debug.body(sprites[i]);
     }
   }
 };
