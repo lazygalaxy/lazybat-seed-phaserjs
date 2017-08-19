@@ -148,6 +148,72 @@ export default class extends Phaser.State {
               sprites.push(ball);
             }
             break;
+          case 'K':
+
+            const xPosi = 500;
+            const yPosi = 400;
+
+            const skinColor = 0xFFFFFF;
+
+            //width and heights
+            const height = 170;
+
+            const headWidth = height * 0.75;
+            const torsoWidth = height * 0.4;
+            const torsoHeight = height * 0.4;
+            const armWidth = torsoWidth * 0.25;
+            const armHeight = torsoHeight * 1.1;
+            const legsHeight = height * 0.4;
+            const feetHeight = height * 0.05;
+
+            //start drawing
+            let kounnas = game.add.graphics(0, 0);
+
+            //feet
+            kounnas.beginFill(0x0000000);
+            kounnas.drawEllipse(xPosi - (torsoWidth / 4.0), yPosi - feetHeight, torsoWidth / 4.0, feetHeight);
+            kounnas.drawEllipse(xPosi + (torsoWidth / 4.0), yPosi - feetHeight, torsoWidth / 4.0, feetHeight);
+
+            //legs
+            kounnas.beginFill(0xFFFF00);
+            kounnas.drawRect(xPosi - (torsoWidth / 2.0), yPosi - feetHeight - legsHeight, torsoWidth, legsHeight);
+            kounnas.beginFill(0x0000000);
+            kounnas.drawRect(xPosi, yPosi - feetHeight - legsHeight / 2.0, 1, legsHeight / 2.0);
+
+            //torso
+            kounnas.beginFill(0xFF0000);
+            kounnas.drawRect(xPosi - (torsoWidth / 2.0), yPosi - feetHeight - legsHeight - torsoHeight, torsoWidth, torsoHeight);
+
+            const armXOffset = armWidth / 2.0;
+            const armYOffset = 0;
+
+            //hands
+            kounnas.beginFill(skinColor);
+            kounnas.drawCircle(xPosi - (torsoWidth / 2.0) - armXOffset, yPosi - feetHeight - legsHeight - torsoHeight + armHeight + armYOffset, armWidth);
+            kounnas.drawCircle(xPosi + (torsoWidth / 2.0) + armXOffset, yPosi - feetHeight - legsHeight - torsoHeight + armHeight + armYOffset, armWidth);
+
+            //arms
+            kounnas.beginFill(0xFF00FF);
+            kounnas.drawRect(xPosi - (torsoWidth / 2.0) - armXOffset - (armWidth / 2.0), yPosi - feetHeight - legsHeight - torsoHeight + armYOffset, armWidth, armHeight);
+            kounnas.drawRect(xPosi + (torsoWidth / 2.0) + armXOffset - (armWidth / 2.0), yPosi - feetHeight - legsHeight - torsoHeight + armYOffset, armWidth, armHeight);
+
+            const headYOffset = headWidth / 3.0;
+
+            //head
+            kounnas.beginFill(skinColor);
+            kounnas.drawCircle(xPosi, yPosi - feetHeight - legsHeight - torsoHeight - headYOffset, headWidth);
+            kounnas.beginFill(0x0000FF);
+
+            const eyeWidth = headWidth / 5.0;
+            const eyeXOffset = headWidth / 4.0;
+
+            //eyes
+            kounnas.drawCircle(xPosi - eyeXOffset, yPosi - feetHeight - legsHeight - torsoHeight - headYOffset, eyeWidth);
+            kounnas.drawCircle(xPosi + eyeXOffset, yPosi - feetHeight - legsHeight - torsoHeight - headYOffset, eyeWidth);
+
+            //game.physics.enable(kounnas, Phaser.Physics.ARCADE)
+            //sky.body.immovable = true;
+            //sprites.push(kounnas);
         }
       }
     }
@@ -246,9 +312,9 @@ export default class extends Phaser.State {
   }
 
   render() {
-    game.debug.body(player);
+    //game.debug.body(player);
     for (var i = 0; i < sprites.length; i++) {
-      game.debug.body(sprites[i]);
+      //game.debug.body(sprites[i]);
     }
   }
-};
+};;;
